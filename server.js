@@ -1,17 +1,21 @@
-const express = require("express");
-//aku pake express, sama uuid pake buat idnya
+const Hapi = require("@hapi/hapi");
 const { v4: uuidv4 } = require("uuid");
-const app = express();
-const PORT = 9000;
 
-app.use(express.json());
+const init = async () => {
+	const server = Hapi.server({
+		port: 9000,
+		host: "localhost",
+	});
 
-// ngimport si route
-const booksRoutes = require("./route");
+	server.route(require("./routes"));
 
-// Panggil route /books dari ./route
-app.use("/books", booksRoutes);
+	await server.start();
+	console.log(`Server running on ${server.info.uri}`);
+};
 
-app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
+process.on("unhandledRejection", (err) => {
+	console.log(err);
+	process.exit(1);
 });
+
+init();
